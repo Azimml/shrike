@@ -85,8 +85,8 @@ class LLMEngine:
                 "empty prompt: a request must have at least one token "
                 "(the prompt tokenized to zero tokens)"
             )
-        if sampling.max_new_tokens < 1:
-            raise ValueError(f"max_new_tokens must be >= 1, got {sampling.max_new_tokens}")
+        # (max_new_tokens/temperature/top_p bounds are validated in
+        # SamplingParams.__post_init__, so they are already sane here.)
         bs = self.block_manager.block_size
         worst_case_blocks = -(-(len(token_ids) + sampling.max_new_tokens) // bs)
         if worst_case_blocks > self.block_manager.num_blocks:
