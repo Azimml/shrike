@@ -1,0 +1,25 @@
+# EditorConfig — consistent whitespace across editors.
+# https://editorconfig.org  (ruff owns line length / formatting; this just
+# fixes the things ruff does not, like final newlines and indent style.)
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+[*.py]
+indent_size = 4
+max_line_length = 100
+
+[*.{yml,yaml,toml,json}]
+indent_size = 2
+
+[*.md]
+# Markdown treats two trailing spaces as a hard line break.
+trim_trailing_whitespace = false
+
+[Makefile]
+indent_style = tab
