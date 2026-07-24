@@ -304,6 +304,32 @@ green pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full
 workflow and test-tier conventions, and [examples/](examples/) for a runnable
 client against the OpenAI-compatible server.
 
+## Troubleshooting
+
+- **`request needs up to N KV blocks but the pool has only M`** — the prompt
+  plus `max_new_tokens` can't fit in the KV pool even empty. Shorten the
+  prompt, lower `max_tokens`, or give the pool more room with a higher
+  `gpu_mem_util` (or a smaller model). The pool is sized once at startup from
+  free VRAM × `gpu_mem_util`.
+- **`model snapshot not found`** (tests) or a tokenizer load error (serving) —
+  run `python scripts/download_model.py`, or point `SHRIKE_MODEL_DIR` at an
+  existing snapshot. Integration tests skip automatically when no snapshot is
+  present; they do not fail.
+- **CUDA out of memory at startup** — lower `--max-running`, lower
+  `gpu_mem_util`, or use a smaller model. On a 4GB card the 0.5B model is the
+  comfortable default.
+- **`No module named 'triton'` / Triton import errors** — Triton is a
+  Linux/CUDA-only optional extra. The default `--attention-backend einsum`
+  needs no Triton and runs on CPU; only pass `--attention-backend triton` when
+  the `.[triton]` extra is installed on a CUDA host.
+- **Garbled or `�` characters mid-stream** — expected transiently: multi-byte
+  glyphs span several BPE tokens, so the incremental decoder buffers until the
+  bytes complete. If they persist to the end of a response, that is a real bug
+  — please file it.
+- **Server returns 422 on a chat request** — the payload failed validation
+  (empty `messages`, an unknown `role`, `top_p` outside `(0, 1]`, or a request
+  too large for the KV pool). The error body's `message` says which.
+
 ## What I learned / design decisions
 
 - **The scheduler is the interesting part; the kernels are the moat.** shrike
