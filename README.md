@@ -1,6 +1,6 @@
-# shrike
+# LLM Inference Engine from Scratch
 
-[![CI](https://github.com/Azimml/shrike/actions/workflows/ci.yml/badge.svg)](https://github.com/Azimml/shrike/actions/workflows/ci.yml)
+[![CI](https://github.com/Azimml/LLM-Inference-Engine-from-Scratch/actions/workflows/ci.yml/badge.svg)](https://github.com/Azimml/LLM-Inference-Engine-from-Scratch/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.11 | 3.12](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](pyproject.toml)
 
@@ -355,4 +355,3 @@ client against the OpenAI-compatible server.
   naive single-sequence cache and against HF transformers, with an explicit,
   documented tolerance for bf16 near-ties rather than a flaky exact-match
   assertion.
-
