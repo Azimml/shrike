@@ -58,8 +58,16 @@ class BlockManager:
         return block
 
     def blocks_needed(self, req: Request, num_new_tokens: int) -> int:
+        # How many *additional* blocks the request needs to hold its tokens
+        # after appending num_new_tokens.
         total = req.num_computed_tokens + num_new_tokens
-        return max(0, -(-total // self.block_size) - len(req.block_table))
+        # ceil(total / block_size) without floats: -(-a // b) rounds up because
+        # Python's // floors toward negative infinity, so negating twice flips
+        # a floor into a ceiling (e.g. -(-13 // 4) == -(-4) == 4 blocks for 13).
+        blocks_for_total = -(-total // self.block_size)
+        # subtract the blocks already in the table; clamp at 0 because a decode
+        # step that stays inside the current final block needs nothing new.
+        return max(0, blocks_for_total - len(req.block_table))
 
     def can_append(self, req: Request, num_new_tokens: int) -> bool:
         return self.blocks_needed(req, num_new_tokens) <= self.num_free
