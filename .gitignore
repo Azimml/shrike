@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+models_cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+bench/results/load_test.json
+/RESUME.md

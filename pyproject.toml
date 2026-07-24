@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shrike"
+version = "0.1.0"
+description = "LLM inference engine from scratch: paged KV cache, continuous batching, chunked prefill, prefix caching, async SSE serving"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Azimbek Olimbekov" }]
+requires-python = ">=3.11"
+
+# Version constraints reflect a verified-working set (see requirements.lock.txt
+# for the exact pins the CI and the benchmarks were run against). Compatible-
+# release (`~=`) bounds allow patch/minor updates while capping the majors that
+# are known to break; torch and triton are given explicit ranges because their
+# wheels are platform/CUDA-tagged and cannot use `~=` cleanly.
+dependencies = [
+    "torch>=2.4,<2.9",
+    "safetensors~=0.7",
+    "transformers>=4.44,<6",  # tokenizer + weight download + parity testing only
+    "fastapi>=0.111,<1",
+    "uvicorn>=0.27,<1",
+    "httpx>=0.27,<1",
+    "numpy>=1.26,<3",
+    "pydantic>=2.5,<3",
+    "huggingface-hub>=0.24,<2",
+]
+
+[project.optional-dependencies]
+bench = ["matplotlib>=3.6,<4"]
+# Triton ships only on Linux/CUDA; keep it optional so CPU-only installs and CI
+# still resolve. The einsum attention backend is the default and needs no Triton.
+triton = ["triton>=3.0,<4; platform_system == 'Linux'"]
+dev = [
+    "pytest>=7.4,<9",
+    "ruff>=0.6,<1",
+    "mypy>=1.8,<3",
+]
+
+[project.scripts]
+shrike = "shrike.cli:main"
+shrike-serve = "shrike.server.api:main"
+
+[tool.setuptools.packages.find]
+include = ["shrike*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: requires the downloaded model weights (and in practice a CUDA device); skipped by default",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["bench/results"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "W",   # pycodestyle warnings
+]
+ignore = [
+    "E501",  # line length is enforced by the formatter, not the linter
+    "B008",  # FastAPI's Depends()/Field() defaults are idiomatic in signatures
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Triton kernels use single-letter tensor names by convention (q, k, v, m, l).
+"shrike/engine/triton_attention.py" = ["E741"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+# The codebase is ~56% type-hinted; run mypy in a non-strict, advisory mode so
+# it surfaces real type errors without demanding annotations on every symbol.
+ignore_missing_imports = true
+check_untyped_defs = false
+
+[[tool.mypy.overrides]]
+# Triton's JIT decorators and tl.* symbols are not statically analyzable.
+module = ["shrike.engine.triton_attention"]
+ignore_errors = true

@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: lint + type-check + unit tests (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install CPU-only PyTorch
+        # The GPU wheels are large and CI has no GPU; the CPU wheel is enough
+        # for the einsum attention path and every unit test.
+        run: pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install project + dev dependencies
+        # Triton is intentionally excluded: it is CUDA/Linux-only and its tests
+        # skip without a GPU anyway.
+        run: pip install -e ".[dev]"
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+      - name: Ruff lint (must pass)
+        run: ruff check .
+
+      - name: Mypy (advisory)
+        # Type checking is advisory: it reports issues but does not fail the
+        # build, so a stubs regression in a dependency can't block a PR.
+        run: mypy shrike/ || true
+        continue-on-error: true
+
+      - name: Unit tests (no model download, CPU only)
+        run: pytest -m "not integration" -v

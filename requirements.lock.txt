@@ -1,0 +1,32 @@
+# Pinned, reproducible dependency set for shrike.
+#
+# These are the exact versions the test suite, benchmarks, and vLLM
+# head-to-head were run against. `pyproject.toml` carries looser compatible-
+# release ranges for installability; this file is the frozen reference.
+#
+# Install with:  pip install -r requirements.lock.txt
+#
+# torch is pinned WITHOUT the local +cu124 CUDA tag so CPU-only environments
+# (including CI) can resolve it. For a CUDA build, install torch from the
+# appropriate index first, e.g.:
+#   pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+#
+# Runtime
+torch==2.6.0
+safetensors==0.7.0
+transformers==5.8.1
+fastapi==0.139.2
+uvicorn==0.27.1
+httpx==0.28.1
+numpy==1.26.4
+pydantic==2.13.4
+huggingface-hub==1.14.0
+
+# Optional extras
+matplotlib==3.6.3          # [bench]
+# triton==3.2.0            # [triton] Linux + CUDA only; uncomment on such hosts
+
+# Dev / CI
+pytest==7.4.4
+ruff==0.16.0
+mypy==2.3.0

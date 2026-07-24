@@ -1,0 +1,34 @@
+{
+  "full": {
+    "tokens": 9213,
+    "seconds": 11.422,
+    "tok_s": 806.6,
+    "steps": 258,
+    "prefix_cache_hit_rate": 0.458,
+    "spec_acceptance_rate": 0.0
+  },
+  "no_prefix_cache": {
+    "tokens": 9213,
+    "seconds": 10.945,
+    "tok_s": 841.8,
+    "steps": 259,
+    "prefix_cache_hit_rate": 0.0,
+    "spec_acceptance_rate": 0.0
+  },
+  "no_chunked_prefill": {
+    "tokens": 9213,
+    "seconds": 10.665,
+    "tok_s": 863.9,
+    "steps": 254,
+    "prefix_cache_hit_rate": 0.0,
+    "spec_acceptance_rate": 0.0
+  },
+  "spec_ngram": {
+    "tokens": 9213,
+    "seconds": 15.775,
+    "tok_s": 584.0,
+    "steps": 233,
+    "prefix_cache_hit_rate": 0.458,
+    "spec_acceptance_rate": 0.271
+  }
+}

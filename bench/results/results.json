@@ -1,0 +1,42 @@
+{
+  "no_kv_cache": {
+    "tokens": 966,
+    "seconds": 22.443238436011598,
+    "tok_s": 43.04191673381644,
+    "num_prompts": 8
+  },
+  "kv_cache": {
+    "tokens": 1851,
+    "seconds": 27.18612192501314,
+    "tok_s": 68.08620976193556,
+    "num_prompts": 16
+  },
+  "static_batching": {
+    "tokens": 9213,
+    "seconds": 11.08721541299019,
+    "tok_s": 830.9570669300526,
+    "num_prompts": 64,
+    "raw_tokens": 16256,
+    "raw_tok_s": 1466.1932139384494
+  },
+  "shrike_engine": {
+    "tokens": 9213,
+    "seconds": 9.808199602062814,
+    "tok_s": 939.3161205714416,
+    "num_prompts": 64
+  },
+  "shrike_metrics": {
+    "steps": 258,
+    "tokens_generated": 9213,
+    "avg_tokens_per_sec": 939.3,
+    "running": 0,
+    "waiting": 0,
+    "kv_blocks_total": 10149,
+    "kv_blocks_free": 10149,
+    "preemptions": 0,
+    "prefix_cache_hit_rate": 0.458,
+    "spec_drafted": 0,
+    "spec_accepted": 0,
+    "spec_acceptance_rate": 0.0
+  }
+}
