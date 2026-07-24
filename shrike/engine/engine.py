@@ -81,13 +81,21 @@ class LLMEngine:
         else:
             token_ids = list(prompt)
         if not token_ids:
-            raise ValueError("empty prompt")
+            raise ValueError(
+                "empty prompt: a request must have at least one token "
+                "(the prompt tokenized to zero tokens)"
+            )
+        if sampling.max_new_tokens < 1:
+            raise ValueError(f"max_new_tokens must be >= 1, got {sampling.max_new_tokens}")
         bs = self.block_manager.block_size
         worst_case_blocks = -(-(len(token_ids) + sampling.max_new_tokens) // bs)
         if worst_case_blocks > self.block_manager.num_blocks:
             raise ValueError(
-                f"request needs up to {worst_case_blocks} KV blocks but the pool "
-                f"has {self.block_manager.num_blocks}; it could never be scheduled"
+                f"request needs up to {worst_case_blocks} KV blocks "
+                f"({len(token_ids)} prompt + {sampling.max_new_tokens} generated tokens, "
+                f"block_size={bs}) but the pool has only {self.block_manager.num_blocks}; "
+                "it could never be scheduled — shorten the prompt, lower max_new_tokens, "
+                "or raise gpu_mem_util"
             )
         req = Request(token_ids=token_ids, sampling=sampling)
         self.requests[req.req_id] = req
