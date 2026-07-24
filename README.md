@@ -116,6 +116,32 @@ HTTP (FastAPI, SSE)  ──►  AsyncEngine (asyncio bridge, per-request queues)
   model code serves the HF-parity test (naive contiguous cache), the offline
   baselines, and the paged batched engine (einsum or Triton decode).
 
+### Deep dive: the paged KV cache
+
+The KV pool is one fixed tensor `[num_layers, 2, num_slots, num_kv_heads,
+head_dim]`, carved into `block_size`-token blocks (16 by default). A sequence
+never owns a contiguous slice of it — instead it holds a **block table**, a
+list of block ids. New tokens are written into whichever free blocks the
+allocator hands out, and attention reads context back through the block table.
+That indirection is what eliminates fragmentation: any free block fits any
+sequence, so the pool packs to near-100% utilization instead of wasting the
+gap between a sequence's length and its next power-of-two reservation.
+
+Allocation is a plain free list (`collections.deque`), popped from the left so
+eviction is LRU. `blocks_needed()` computes the *delta* — `ceil(total /
+block_size) - len(block_table)` — so a decode step that stays inside the
+current final block allocates nothing, which is the common case.
+
+**Automatic prefix caching** rides on top. Every *full* block is content-keyed
+by a chain hash `h_i = hash(h_{i-1}, tokens_i)`, so two requests that share a
+prompt prefix compute identical hashes for the shared blocks. Freed blocks
+keep their hash and stay on the free list; a later request that matches the
+hash *revives* the block (ref count 0 → 1) instead of recomputing its KV.
+Blocks are ref-counted, so a shared prefix is safely read by many sequences at
+once and only truly freed when the last owner releases it. The match
+deliberately stops one token short of the whole prompt — the forward pass
+still needs at least one uncached token to produce logits to sample from.
+
 ### OpenAI-compatible serving
 
 The server speaks the OpenAI wire format, so any OpenAI client library points
