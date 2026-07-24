@@ -265,6 +265,19 @@ CI (GitHub Actions, Python 3.11 and 3.12) installs CPU-only PyTorch, checks
 clean), and executes the unit tier. It never touches a GPU or downloads a
 model.
 
+## Development
+
+```bash
+pip install -e ".[dev]"   # ruff, pytest, mypy
+make check                # the pre-push gate: ruff format --check, ruff check, unit tests
+```
+
+`make` wraps the common tasks (`make help` lists them): `fmt`, `lint`,
+`typecheck`, `test`, `test-all`. They mirror CI, so a green `make check` is a
+green pull request. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full
+workflow and test-tier conventions, and [examples/](examples/) for a runnable
+client against the OpenAI-compatible server.
+
 ## What I learned / design decisions
 
 - **The scheduler is the interesting part; the kernels are the moat.** shrike
