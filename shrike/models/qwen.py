@@ -22,7 +22,14 @@ from safetensors.torch import load_file
 
 class QwenConfig:
     def __init__(self, model_dir: str | Path):
-        raw = json.loads((Path(model_dir) / "config.json").read_text())
+        config_path = Path(model_dir) / "config.json"
+        if not config_path.is_file():
+            raise FileNotFoundError(
+                f"no config.json under {model_dir!r}; download a snapshot with "
+                "`python scripts/download_model.py` or set SHRIKE_MODEL_DIR to an "
+                "existing model directory"
+            )
+        raw = json.loads(config_path.read_text())
         self.hidden_size: int = raw["hidden_size"]
         self.intermediate_size: int = raw["intermediate_size"]
         self.num_layers: int = raw["num_hidden_layers"]
@@ -192,8 +199,14 @@ class QwenForCausalLM(nn.Module):
             model = cls(cfg, device=dev)
         model.rotary = RotaryEmbedding(cfg.head_dim, cfg.rope_theta, dev)  # rebuild off-meta
 
+        shards = sorted(Path(model_dir).glob("*.safetensors"))
+        if not shards:
+            raise FileNotFoundError(
+                f"no *.safetensors weight shards under {model_dir!r}; the snapshot "
+                "looks incomplete — re-run `python scripts/download_model.py`"
+            )
         state = {}
-        for shard in sorted(Path(model_dir).glob("*.safetensors")):
+        for shard in shards:
             state.update(load_file(shard))
         if cfg.tie_word_embeddings and "lm_head.weight" not in state:
             state["lm_head.weight"] = state["model.embed_tokens.weight"]
