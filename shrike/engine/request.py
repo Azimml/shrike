@@ -15,6 +15,21 @@ class Status(enum.Enum):
 
 @dataclass
 class SamplingParams:
+    """Per-request decoding controls.
+
+    Fields:
+        max_new_tokens: hard cap on generated tokens; a request finishes with
+            reason ``"length"`` when it is hit. Must be >= 1.
+        temperature: softmax temperature. ``0.0`` selects greedy (argmax)
+            decoding — the only mode speculation runs in, since drafts are
+            verified against greedy. Must be >= 0.
+        top_p: nucleus sampling threshold, in ``(0, 1]``; ignored when greedy.
+            Keeps the smallest set of tokens whose cumulative probability
+            reaches ``top_p`` (the top-1 token is always kept).
+        ignore_eos: keep generating past the EOS token until ``max_new_tokens``.
+            Used by benchmarks to force fixed-length, comparable generations.
+    """
+
     max_new_tokens: int = 128
     temperature: float = 0.0  # 0 => greedy
     top_p: float = 1.0
