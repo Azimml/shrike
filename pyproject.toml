@@ -19,7 +19,7 @@ requires-python = ">=3.11"
 dependencies = [
     "torch>=2.4,<2.9",
     "safetensors~=0.7",
-    "transformers>=4.44,<6",  # tokenizer + weight download + parity testing only
+    "transformers>=5.14.1,<6",  # tokenizer + weight download + parity testing only
     "fastapi>=0.111,<1",
     "uvicorn>=0.27,<1",
     "httpx>=0.27,<1",
