@@ -355,3 +355,4 @@ client against the OpenAI-compatible server.
   naive single-sequence cache and against HF transformers, with an explicit,
   documented tolerance for bf16 near-ties rather than a flaky exact-match
   assertion.
+
