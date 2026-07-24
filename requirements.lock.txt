@@ -18,7 +18,7 @@ transformers==5.8.1
 fastapi==0.139.2
 uvicorn==0.27.1
 httpx==0.28.1
-numpy==1.26.4
+numpy==2.4.6
 pydantic==2.13.4
 huggingface-hub==1.14.0
 
