@@ -4,6 +4,8 @@ These pin down the invariants the scheduler and engine rely on: prompt-length
 capture at construction, the generated/computed accounting, and prefill_done.
 """
 
+import pytest
+
 from shrike.engine.request import Request, SamplingParams, Status
 
 
@@ -53,3 +55,24 @@ def test_sampling_defaults_are_greedy():
     assert sp.temperature == 0.0  # 0 => greedy
     assert sp.top_p == 1.0
     assert sp.ignore_eos is False
+
+
+def test_sampling_accepts_valid_bounds():
+    # boundary values that must be allowed
+    SamplingParams(max_new_tokens=1, temperature=0.0, top_p=1.0)
+    SamplingParams(temperature=2.5, top_p=0.01)
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        ({"max_new_tokens": 0}, "max_new_tokens"),
+        ({"max_new_tokens": -1}, "max_new_tokens"),
+        ({"temperature": -0.1}, "temperature"),
+        ({"top_p": 0.0}, "top_p"),
+        ({"top_p": 1.5}, "top_p"),
+    ],
+)
+def test_sampling_rejects_out_of_range(kwargs, match):
+    with pytest.raises(ValueError, match=match):
+        SamplingParams(**kwargs)
