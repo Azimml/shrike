@@ -18,7 +18,7 @@ requires-python = ">=3.11"
 # wheels are platform/CUDA-tagged and cannot use `~=` cleanly.
 dependencies = [
     "torch>=2.4,<2.9",
-    "safetensors~=0.7",
+    "safetensors~=0.8",
     "transformers>=4.44,<6",  # tokenizer + weight download + parity testing only
     "fastapi>=0.111,<1",
     "uvicorn>=0.27,<1",
