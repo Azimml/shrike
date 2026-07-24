@@ -68,7 +68,7 @@ class RMSNorm(nn.Module):
 
 
 class RotaryEmbedding(nn.Module):
-    def __init__(self, head_dim: int, theta: float, device):
+    def __init__(self, head_dim: int, theta: float, device: torch.device | str):
         super().__init__()
         inv_freq = 1.0 / (theta ** (torch.arange(0, head_dim, 2, device=device).float() / head_dim))
         self.inv_freq: torch.Tensor

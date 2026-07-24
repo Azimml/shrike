@@ -21,14 +21,16 @@ from shrike.engine.request import Request
 class Block:
     __slots__ = ("block_id", "ref_count", "hash")
 
-    def __init__(self, block_id: int):
+    def __init__(self, block_id: int) -> None:
         self.block_id = block_id
         self.ref_count = 0
         self.hash: int | None = None
 
 
 class BlockManager:
-    def __init__(self, num_blocks: int, block_size: int, enable_prefix_caching: bool = True):
+    def __init__(
+        self, num_blocks: int, block_size: int, enable_prefix_caching: bool = True
+    ) -> None:
         self.block_size = block_size
         self.num_blocks = num_blocks
         self.enable_prefix_caching = enable_prefix_caching

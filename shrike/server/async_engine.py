@@ -28,7 +28,7 @@ class TokenEvent:
 
 
 class AsyncEngine:
-    def __init__(self, engine: LLMEngine):
+    def __init__(self, engine: LLMEngine) -> None:
         self.engine = engine
         self.queues: dict[int, asyncio.Queue[TokenEvent]] = {}
         self.decoded: dict[int, list[int]] = {}  # req_id -> undecoded token buffer

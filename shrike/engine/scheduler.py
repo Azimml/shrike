@@ -31,7 +31,7 @@ class Scheduler:
         max_running: int = 256,
         spec_ngram: int = 0,  # n-gram size for prompt-lookup speculation, 0 = off
         spec_k: int = 4,  # max draft tokens per step
-    ):
+    ) -> None:
         self.bm = block_manager
         self.max_tokens_per_step = max_tokens_per_step
         self.max_running = max_running

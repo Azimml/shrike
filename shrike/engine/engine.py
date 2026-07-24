@@ -50,7 +50,7 @@ class LLMEngine:
         spec_ngram: int = 0,
         spec_k: int = 4,
         attention_backend: str = "einsum",
-    ):
+    ) -> None:
         self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
         self.model = QwenForCausalLM.load(model_dir)
         self.runner = ModelRunner(self.model, block_size, gpu_mem_util, attention_backend)

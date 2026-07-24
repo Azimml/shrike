@@ -14,7 +14,7 @@ from shrike.engine.engine import LLMEngine
 from shrike.engine.request import SamplingParams
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("prompt", nargs="?", default="Explain how a paged KV cache works, briefly.")
     parser.add_argument("--max-tokens", type=int, default=128)
